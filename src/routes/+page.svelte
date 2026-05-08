@@ -45,15 +45,17 @@
 		>
 	</form>
 
-	<ul>
+	<ul class="p-8 font-hina text-2xl text-pink-900 duration-300">
 		{#each tasks as task (task.id)}
-			<li>{task.text}</li>
+			<li class="flex flex-row gap-2">
+				<input
+					type="checkbox"
+					class="h-6 w-6 mt-1 appearance-none rounded-md border-2 border-pink-800/50 bg-linear-to-b from-white to-pink-good/230 duration-200 checked:border-pink-800 checked:bg-pink-800 hover:scale-105"
+				/>
+				{task.text}
+			</li>
 		{/each}
 	</ul>
-
-	<h3 class="font-hina text-xl text-pink-950">
-		i made this solely for myself but why not i guess anyone can use it
-	</h3>
 </div>
 
 <h3 class="m-2 px-4 text-left font-hina text-xl text-pink-950">
@@ -62,4 +64,6 @@
 	<br /> last updated may 2026
 </h3>
 <!-- 
-        <button type="submit" class="px-4 rounded-md bg-linear-to-b from-pink-good to-pink-900/35 mb-4 pb-3 ml-4 text-3xl text-pink-950 font-bold font-hina">+</button> -->
+	<h3 class="font-hina text-xl text-pink-950">
+		i made this solely for myself but why not i guess anyone can use it
+	</h3> -->
