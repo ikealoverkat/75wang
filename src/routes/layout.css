@@ -1,2 +1,17 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+
+@font-face {
+    font-family: 'hina';
+    src: url('/fonts/hina.ttf');
+}
+
+@font-face {
+    font-family: 'kisba';
+    src: url('/fonts/kisba.otf');
+}
+
+@theme {
+    --font-hina: "hina", serif;
+    --font-kisba: "kisba", serif;
+}
