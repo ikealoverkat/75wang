@@ -3,18 +3,23 @@
 	import { onMount } from 'svelte';
 	import dayjs from 'dayjs';
 	dayjs().format();
+	import dayOfYear from 'dayjs/plugin/dayOfYear';
+	dayjs.extend(dayOfYear);
 
 	let tasks = $state([]);
 	let newTask = $state('');
 	let InputElement = $state();
 	let placeholder = $state();
 
-	let currentDay = 0;
+	let currentDay = $state(0);
+	let startingDate = $state();
 
-	let days = Array.from({ length: 75 }, (_, day) => ({
-		id: day,
-		completion: false
-	}));
+	let days = $state(
+		Array.from({ length: 75 }, (_, day) => ({
+			id: day,
+			completion: false
+		}))
+	);
 
 	let areYouSureDiv = $state();
 
@@ -26,6 +31,11 @@
 				placeholder.style.display = 'none';
 			}
 		}
+		currentDay = dayjs().diff(startingDate, 'day');
+        startingDate = dayjs("2026-05-08");
+        // startingDate = dayjs(localStorage.getItem('startingDate'));
+		console.log(currentDay);
+		console.log(startingDate);
 	});
 
 	function addTask(e) {
@@ -43,15 +53,14 @@
 		console.log($state.snapshot(tasks));
 	}
 
-$effect(() => {
-	const allDone = tasks.length > 0 && tasks.every(t => t.completed);
+	$effect(() => {
+		const allDone = tasks.length > 0 && tasks.every((t) => t.completed);
 
-	days = days.map((d, i) =>
-		i === currentDay
-			? { ...d, completion: allDone }
-			: d
-	);
-});
+		if (days[currentDay]?.completion !== allDone) {
+			days[currentDay].completion = allDone;
+			localStorage.setItem('days', JSON.stringify(days));
+		}
+	});
 </script>
 
 <div class="flex h-screen w-screen flex-col place-items-center overflow-x-hidden bg-pink-50 p-12">
@@ -102,7 +111,7 @@ $effect(() => {
 						class="flex flex-row gap-10 duration-300 hover:gap-11 hover:p-1 [&>button]:opacity-0 [&>button]:duration-300 hover:[&>button]:opacity-100"
 						onclick={() => {
 							task.completed = !task.completed;
-                            tasks = tasks;
+							tasks = tasks;
 						}}
 					>
 						<input
@@ -136,26 +145,42 @@ $effect(() => {
 				{/each}
 			</ul>
 		</div>
-		<!-- tracker -->
-		<div class="m-8 flex w-1/2 flex-row flex-wrap gap-2">
-			{#each days as day (day.id)}
-				<div class="relative">
-					<div
-						class="duration-200 absolute top-0 z-0 h-12 w-12 origin-bottom bg-pink-good transition-transform"
-						class:scale-y-100={day.completion === true}
-						class:scale-y-0={day.completion === false}
-					></div>
-					<!-- day -->
-					<div
-						class={day.id == currentDay
-							? 'z-10 h-12 w-12 place-content-center bg-pink-good/20 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-950/50 outline-2 outline-pink-900/50 duration-100 hover:scale-105'
-							: 'z-10 h-12 w-12 place-content-center bg-pink-good/5 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-800/30 outline outline-pink-900/50 duration-100 hover:scale-105'}
-					>
-						{day.id + 1}
+		<!-- tracking half -->
+		<div class="flex flex-col items-center">
+			<!-- tracker -->
+			<div class="m-8 flex w-1/2 flex-row flex-wrap gap-2">
+				{#each days as day (day.id)}
+					<div class="relative">
+						<div
+							class="absolute top-0 z-0 h-12 w-12 origin-bottom bg-pink-good transition-transform duration-200"
+							class:scale-y-100={day.completion === true}
+							class:scale-y-0={day.completion === false}
+						></div>
+						<!-- day -->
+						<div
+							class={day.id == currentDay
+								? 'relative z-10 h-12 w-12 place-content-center bg-pink-good/20 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-950/50 outline-2 outline-pink-900/50 duration-100 hover:scale-105'
+								: 'relative z-10 h-12 w-12 place-content-center bg-pink-good/5 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-800/30 outline outline-pink-900/50 duration-100 hover:scale-105'}
+						>
+							{day.id + 1}
+						</div>
 					</div>
-				</div>
-			{/each}
+				{/each}
+			</div>
+			<!-- start button -->
+			<button
+				onclick={() => {
+					startingDate = dayjs();
+					console.log(startingDate);
+					localStorage.setItem('startingDate', startingDate);
+                    this.classList.add('hidden');
+				}}
+				class="bg-linear-to-b from-white/50 to-pink-100/50 p-4 text-center font-hina text-xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-2 hover:from-white hover:to-pink-100 hover:p-5 hover:shadow-sm hover:outline-pink-800/50 active:m-1 active:p-1"
+			>
+				start
+			</button>
 		</div>
+
 		<!-- hours until end of day -->
 		<!-- days -->
 	</div>
@@ -172,7 +197,7 @@ $effect(() => {
 
 	<!-- are you sure clear -->
 	<div
-		class="absolute top-0 flex h-screen w-screen bg-[#1F1010]/35 backdrop-blur-xs"
+		class="absolute top-0 z-20 flex h-screen w-screen bg-[#1F1010]/35 backdrop-blur-xs"
 		bind:this={areYouSureDiv}
 		style="display: none"
 	>
