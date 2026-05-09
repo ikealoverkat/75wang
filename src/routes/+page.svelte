@@ -9,11 +9,11 @@
 	let InputElement = $state();
 	let placeholder = $state();
 
-	let currentDay = 1;
+	let currentDay = 0;
 
 	let days = Array.from({ length: 75 }, (_, day) => ({
 		id: day,
-		completion: 0
+		completion: false
 	}));
 
 	let areYouSureDiv = $state();
@@ -42,6 +42,16 @@
 		localStorage.setItem('tasks', JSON.stringify(tasks));
 		console.log($state.snapshot(tasks));
 	}
+
+$effect(() => {
+	const allDone = tasks.length > 0 && tasks.every(t => t.completed);
+
+	days = days.map((d, i) =>
+		i === currentDay
+			? { ...d, completion: allDone }
+			: d
+	);
+});
 </script>
 
 <div class="flex h-screen w-screen flex-col place-items-center overflow-x-hidden bg-pink-50 p-12">
@@ -92,6 +102,7 @@
 						class="flex flex-row gap-10 duration-300 hover:gap-11 hover:p-1 [&>button]:opacity-0 [&>button]:duration-300 hover:[&>button]:opacity-100"
 						onclick={() => {
 							task.completed = !task.completed;
+                            tasks = tasks;
 						}}
 					>
 						<input
@@ -130,15 +141,15 @@
 			{#each days as day (day.id)}
 				<div class="relative">
 					<div
-						class="absolute top-0 h-12 w-12 bg-pink-good"
-						class:scale-y-100={(day.completion = 1)}
-						class:scale-y-0={(day.completion = 0)}
+						class="duration-200 absolute top-0 z-0 h-12 w-12 origin-bottom bg-pink-good transition-transform"
+						class:scale-y-100={day.completion === true}
+						class:scale-y-0={day.completion === false}
 					></div>
 					<!-- day -->
-                    <div
-						class={day.id == currentDay - 1
-							? 'h-12 w-12 place-content-center bg-pink-good/20 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-950/50 outline-2 outline-pink-900/50 duration-100 hover:scale-105'
-							: 'h-12 w-12 place-content-center bg-pink-good/5 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-800/30 outline outline-pink-900/50 duration-100 hover:scale-105'}
+					<div
+						class={day.id == currentDay
+							? 'z-10 h-12 w-12 place-content-center bg-pink-good/20 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-950/50 outline-2 outline-pink-900/50 duration-100 hover:scale-105'
+							: 'z-10 h-12 w-12 place-content-center bg-pink-good/5 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-800/30 outline outline-pink-900/50 duration-100 hover:scale-105'}
 					>
 						{day.id + 1}
 					</div>
