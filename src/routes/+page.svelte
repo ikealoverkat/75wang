@@ -7,6 +7,8 @@
 	let InputElement = $state();
 	let placeholder = $state();
 
+	let areYouSureDiv = $state();
+
 	onMount(() => {
 		let storedTasks = localStorage.getItem('tasks');
 		if (storedTasks) {
@@ -109,16 +111,43 @@
 	<!-- clear button -->
 	<button
 		onclick={() => {
-			localStorage.clear();
-			tasks.length = 0;
-			placeholder.style.display = 'block';
+			areYouSureDiv.style.display = 'flex';
 		}}
-		class="absolute bottom-20 bg-linear-to-b from-white/50 to-pink-100/50 p-2 text-center font-hina text-xl font-bold text-pink-800/75 italic outline outline-pink-800/20 duration-200 hover:m-2 hover:from-white hover:to-pink-100 hover:p-3 hover:outline-pink-800/50 hover:shadow-sm shadow-pink-800 active:p-1 active:m-1"
+		class="absolute bottom-20 bg-linear-to-b from-white/50 to-pink-100/50 p-2 text-center font-hina text-xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-2 hover:from-white hover:to-pink-100 hover:p-3 hover:shadow-sm hover:outline-pink-800/50 active:m-1 active:p-1"
 	>
 		clear all progress
 	</button>
 
-    <!-- are you sure clear -->
+	<!-- are you sure clear -->
+	<div
+		class="absolute top-0 flex h-screen w-screen bg-[#1F1010]/35 backdrop-blur-xs"
+		bind:this={areYouSureDiv}
+		style="display: none"
+	>
+		<div
+			class="m-auto flex h-fit flex-col items-center bg-pink-100 p-24 pb-15 outline outline-pink-950"
+		>
+			<h1 class="font-kisba text-4xl text-pink-950">are you sure?</h1>
+			<p class="m-2 mb-4 text-center font-hina text-2xl text-pretty text-pink-800">
+				proceeding will completely clear your task list and progress.
+			</p>
+			<span class="m-4 flex gap-12">
+				<button
+					class="bg-pink-good p-2 font-hina text-xl text-pink-950 shadow-xs shadow-pink-950/50 outline outline-pink-950/50 duration-200 hover:scale-104 hover:bg-[#F7ADC7] hover:shadow-sm"
+					onclick={(areYouSureDiv.style.display = 'none')}>no, go back</button
+				>
+				<button
+					class="bg-[#BA6C8A] p-2 font-hina text-xl text-white shadow-xs shadow-pink-950/50 outline outline-pink-950/50 duration-200 hover:scale-104 hover:bg-[#AD637F] hover:shadow-sm"
+					onclick={() => {
+						localStorage.clear();
+						tasks.length = 0;
+						placeholder.style.display = 'block';
+                        areYouSureDiv.style.display = 'none';
+					}}>OK</button
+				>
+			</span>
+		</div>
+	</div>
 </div>
 
 <h3 class="m-2 px-4 text-left font-hina text-xl text-pink-950">
