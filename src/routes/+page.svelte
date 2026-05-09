@@ -1,11 +1,20 @@
 <script>
 	import { text } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
+	import dayjs from 'dayjs';
+	dayjs().format();
 
 	let tasks = $state([]);
 	let newTask = $state('');
 	let InputElement = $state();
 	let placeholder = $state();
+
+	let currentDay = 1;
+
+	let days = Array.from({ length: 75 }, (_, day) => ({
+		id: day,
+		completion: 0
+	}));
 
 	let areYouSureDiv = $state();
 
@@ -38,75 +47,107 @@
 <div class="flex h-screen w-screen flex-col place-items-center overflow-x-hidden bg-pink-50 p-12">
 	<!-- title card -->
 	<div class="flex w-1/3 flex-row items-center">
-		<img src="/75wlogo.png" alt="75wang logo" class="h-35 w-auto duration-300 hover:scale-102" />
+		<img
+			src="/75wlogo.png"
+			alt="75wang logo"
+			class="h-35 w-auto p-0.5 duration-300 hover:scale-102 hover:p-0"
+		/>
 		<div class="m-4 flex flex-col">
-			<h1 class="font-kisba text-4xl text-pink-950 duration-200 hover:p-1"><i>/75wæŋ/:</i></h1>
-			<h2 class="font-kisba text-2xl text-pink-900 duration-200 hover:p-1">
+			<!-- <h1 class="font-kisba text-4xl text-pink-950 duration-200 hover:p-1"><i>/75wæŋ/:</i></h1> -->
+			<h1 class="font-kisba text-4xl text-pink-950 duration-200 hover:p-1"><i>/七十五王/:</i></h1>
+			<h2 class="font-kisba text-2xl text-pink-900 duration-200">
 				<b>75wang:</b> a customizable 75 hard tracker
 			</h2>
 		</div>
 	</div>
 
-	<!-- add tasks -->
-	<form id="task-form" class="flex w-[40%] flex-row justify-between p-2" onsubmit={addTask}>
-		<input
-			type="text"
-			id="task-input"
-			bind:value={newTask}
-			bind:this={InputElement}
-			placeholder="enter goals here..."
-			class="mb-4 w-full p-2 px-6 font-hina text-[22px] text-pink-950 duration-300 hover:p-3 focus:outline-none"
-			autocomplete="off"
-		/>
-		<button
-			type="submit"
-			class="mb-4 ml-4 hidden px-4 font-hina text-[22px] font-bold text-pink-800 duration-300 hover:scale-110 hover:rotate-10"
-			>+</button
-		>
-	</form>
-
-	<!-- task list -->
-	<ul class="p-8 font-hina text-2xl text-pink-900 duration-300">
-		<p bind:this={placeholder} class="text-pink-900/40 italic">no goals yet. add one!</p>
-		{#each tasks as task (task.id)}
-			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-			<!-- svelte-ignore a11y_click_events_have_key_events -->
-			<li
-				class="flex flex-row gap-10 duration-300 hover:gap-11 hover:p-1 [&>button]:opacity-0 [&>button]:duration-300 hover:[&>button]:opacity-100"
-				onclick={() => {
-					task.completed = !task.completed;
-				}}
-			>
+	<div class="flex h-full flex-row items-start justify-center">
+		<!-- tasks -->
+		<div class="w-full">
+			<!-- add tasks -->
+			<form id="task-form" class="flex flex-row justify-between p-2" onsubmit={addTask}>
 				<input
-					type="checkbox"
-					bind:checked={task.completed}
-					class="mt-1 h-6 w-6 appearance-none rounded-md border-2 border-pink-800/20 bg-linear-to-b from-white to-pink-good/230 duration-200 checked:border-pink-800 checked:bg-pink-800 hover:scale-105"
+					type="text"
+					id="task-input"
+					bind:value={newTask}
+					bind:this={InputElement}
+					placeholder="enter goals here..."
+					class="mb-4 w-full p-2 px-6 font-hina text-[22px] text-pink-950 duration-300 hover:p-3 focus:outline-none"
+					autocomplete="off"
 				/>
-				<div class="relative w-fit">
-					<span>{task.text}</span>
-					<span
-						class="absolute top-1/2 -left-1 h-0.5 w-full origin-left bg-pink-900/95 transition-transform duration-300"
-						class:scale-x-120={task.completed}
-						class:scale-x-0={!task.completed}
-					>
-					</span>
-				</div>
 				<button
-					onclick={() => {
-						tasks.splice(tasks.indexOf(task), 1);
-						if (tasks.length > 0) {
-							placeholder.style.display = 'none';
-						} else {
-							placeholder.style.display = 'block';
-						}
-					}}
-					class=" font-bold text-pink-900/40 hover:text-pink-900/70"
+					type="submit"
+					class="mb-4 ml-4 hidden px-4 font-hina text-[22px] font-bold text-pink-800 duration-300 hover:scale-110 hover:rotate-10"
+					>+</button
 				>
-					—
-				</button>
-			</li>
-		{/each}
-	</ul>
+			</form>
+
+			<!-- task list -->
+			<ul class="p-8 font-hina text-2xl text-pink-900 duration-300">
+				<p bind:this={placeholder} class="text-pink-900/40 italic">no goals yet. add one!</p>
+				{#each tasks as task (task.id)}
+					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<li
+						class="flex flex-row gap-10 duration-300 hover:gap-11 hover:p-1 [&>button]:opacity-0 [&>button]:duration-300 hover:[&>button]:opacity-100"
+						onclick={() => {
+							task.completed = !task.completed;
+						}}
+					>
+						<input
+							type="checkbox"
+							bind:checked={task.completed}
+							class="mt-1 h-6 w-6 appearance-none rounded-md border-2 border-pink-800/20 bg-linear-to-b from-white to-pink-good/230 duration-200 checked:border-pink-800 checked:bg-pink-800 hover:scale-105"
+						/>
+						<div class="relative w-fit">
+							<span>{task.text}</span>
+							<span
+								class="absolute top-1/2 -left-1 h-0.5 w-full origin-left bg-pink-900/95 transition-transform duration-300"
+								class:scale-x-120={task.completed}
+								class:scale-x-0={!task.completed}
+							>
+							</span>
+						</div>
+						<button
+							onclick={() => {
+								tasks.splice(tasks.indexOf(task), 1);
+								if (tasks.length > 0) {
+									placeholder.style.display = 'none';
+								} else {
+									placeholder.style.display = 'block';
+								}
+							}}
+							class=" font-bold text-pink-900/40 hover:text-pink-900/70"
+						>
+							—
+						</button>
+					</li>
+				{/each}
+			</ul>
+		</div>
+		<!-- tracker -->
+		<div class="m-8 flex w-1/2 flex-row flex-wrap gap-2">
+			{#each days as day (day.id)}
+				<div class="relative">
+					<div
+						class="absolute top-0 h-12 w-12 bg-pink-good"
+						class:scale-y-100={(day.completion = 1)}
+						class:scale-y-0={(day.completion = 0)}
+					></div>
+					<!-- day -->
+                    <div
+						class={day.id == currentDay - 1
+							? 'h-12 w-12 place-content-center bg-pink-good/20 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-950/50 outline-2 outline-pink-900/50 duration-100 hover:scale-105'
+							: 'h-12 w-12 place-content-center bg-pink-good/5 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-800/30 outline outline-pink-900/50 duration-100 hover:scale-105'}
+					>
+						{day.id + 1}
+					</div>
+				</div>
+			{/each}
+		</div>
+		<!-- hours until end of day -->
+		<!-- days -->
+	</div>
 
 	<!-- clear button -->
 	<button
@@ -142,7 +183,7 @@
 						localStorage.clear();
 						tasks.length = 0;
 						placeholder.style.display = 'block';
-                        areYouSureDiv.style.display = 'none';
+						areYouSureDiv.style.display = 'none';
 					}}>OK</button
 				>
 			</span>
