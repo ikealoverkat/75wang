@@ -1,10 +1,21 @@
 <script>
 	import { text } from '@sveltejs/kit';
+	import { onMount } from 'svelte';
 
 	let tasks = $state([]);
 	let newTask = $state('');
 	let InputElement = $state();
 	let placeholder = $state();
+
+	onMount(() => {
+		let storedTasks = localStorage.getItem('tasks');
+		if (storedTasks) {
+			tasks = JSON.parse(storedTasks);
+            if (tasks.length > 0) {
+                placeholder.style.display = 'none';
+            }
+		}
+	});
 
 	function addTask(e) {
 		if (e) e.preventDefault();
@@ -14,7 +25,11 @@
 			newTask = '';
 		}
 		InputElement.focus();
-		if (placeholder.style.display !== 'none') placeholder.style.display = 'none';
+		
+        if (placeholder.style.display !== 'none') placeholder.style.display = 'none';
+
+		localStorage.setItem('tasks', JSON.stringify(tasks));
+		console.log($state.snapshot(tasks));
 	}
 </script>
 
@@ -59,10 +74,10 @@
 				<div class="relative w-fit">
 					<span>{task.text}</span>
 					<span
-                    class="absolute -left-1 top-1/2 h-0.5 w-full origin-left bg-pink-900/95 transition-transform duration-300"
-                    class:scale-x-120={task.completed}
-                    class:scale-x-0={!task.completed}
-                >
+						class="absolute top-1/2 -left-1 h-0.5 w-full origin-left bg-pink-900/95 transition-transform duration-300"
+						class:scale-x-120={task.completed}
+						class:scale-x-0={!task.completed}
+					>
 					</span>
 				</div>
 			</li>
