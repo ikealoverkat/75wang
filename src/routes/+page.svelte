@@ -11,9 +11,9 @@
 		let storedTasks = localStorage.getItem('tasks');
 		if (storedTasks) {
 			tasks = JSON.parse(storedTasks);
-            if (tasks.length > 0) {
-                placeholder.style.display = 'none';
-            }
+			if (tasks.length > 0) {
+				placeholder.style.display = 'none';
+			}
 		}
 	});
 
@@ -25,24 +25,27 @@
 			newTask = '';
 		}
 		InputElement.focus();
-		
-        if (placeholder.style.display !== 'none') placeholder.style.display = 'none';
+
+		if (placeholder.style.display !== 'none') placeholder.style.display = 'none';
 
 		localStorage.setItem('tasks', JSON.stringify(tasks));
 		console.log($state.snapshot(tasks));
 	}
 </script>
 
-<div class="h-screen w-screen place-items-center overflow-x-hidden bg-pink-50 p-12">
-	<img src="/75wlogo.png" alt="75wang logo" class="h-35 w-auto duration-300 hover:scale-102" />
-	<div class="m-4 flex flex-row gap-2">
-		<!-- <h1 class="font-kisba text-4xl text-pink-950 duration-200 hover:p-1"><i>/75wæŋ/:</i></h1> -->
-		<h2 class="m-2.5 font-kisba text-2xl text-pink-900 duration-200 hover:p-1">
-			<b>75wang -</b> a customizable 75 hard tracker
-		</h2>
+<div class="flex h-screen w-screen flex-col place-items-center overflow-x-hidden bg-pink-50 p-12">
+	<!-- title card -->
+	<div class="flex w-1/3 flex-row items-center">
+		<img src="/75wlogo.png" alt="75wang logo" class="h-35 w-auto duration-300 hover:scale-102" />
+		<div class="m-4 flex flex-col">
+			<h1 class="font-kisba text-4xl text-pink-950 duration-200 hover:p-1"><i>/75wæŋ/:</i></h1>
+			<h2 class="font-kisba text-2xl text-pink-900 duration-200 hover:p-1">
+				<b>75wang:</b> a customizable 75 hard tracker
+			</h2>
+		</div>
 	</div>
 
-	<!-- <input placeholder="enter goals here..." type="checkbox" /> -->
+	<!-- add tasks -->
 	<form id="task-form" class="flex w-[40%] flex-row justify-between p-2" onsubmit={addTask}>
 		<input
 			type="text"
@@ -60,16 +63,22 @@
 		>
 	</form>
 
+	<!-- task list -->
 	<ul class="p-8 font-hina text-2xl text-pink-900 duration-300">
 		<p bind:this={placeholder} class="text-pink-900/40 italic">no goals yet. add one!</p>
 		{#each tasks as task (task.id)}
-			<li class="flex flex-row gap-10">
+			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+			<!-- svelte-ignore a11y_click_events_have_key_events -->
+			<li
+				class="flex flex-row gap-10 duration-300 hover:gap-11 hover:p-1 [&>button]:opacity-0 [&>button]:duration-300 hover:[&>button]:opacity-100"
+				onclick={() => {
+					task.completed = !task.completed;
+				}}
+			>
 				<input
 					type="checkbox"
+					bind:checked={task.completed}
 					class="mt-1 h-6 w-6 appearance-none rounded-md border-2 border-pink-800/20 bg-linear-to-b from-white to-pink-good/230 duration-200 checked:border-pink-800 checked:bg-pink-800 hover:scale-105"
-					onclick={() => {
-						task.completed = !task.completed;
-					}}
 				/>
 				<div class="relative w-fit">
 					<span>{task.text}</span>
@@ -80,9 +89,36 @@
 					>
 					</span>
 				</div>
+				<button
+					onclick={() => {
+						tasks.splice(tasks.indexOf(task), 1);
+						if (tasks.length > 0) {
+							placeholder.style.display = 'none';
+						} else {
+							placeholder.style.display = 'block';
+						}
+					}}
+					class=" font-bold text-pink-900/40 hover:text-pink-900/70"
+				>
+					—
+				</button>
 			</li>
 		{/each}
 	</ul>
+
+	<!-- clear button -->
+	<button
+		onclick={() => {
+			localStorage.clear();
+			tasks.length = 0;
+			placeholder.style.display = 'block';
+		}}
+		class="absolute bottom-20 bg-linear-to-b from-white/50 to-pink-100/50 p-2 text-center font-hina text-xl font-bold text-pink-800/75 italic outline outline-pink-800/20 duration-200 hover:m-2 hover:from-white hover:to-pink-100 hover:p-3 hover:outline-pink-800/50 hover:shadow-sm shadow-pink-800 active:p-1 active:m-1"
+	>
+		clear all progress
+	</button>
+
+    <!-- are you sure clear -->
 </div>
 
 <h3 class="m-2 px-4 text-left font-hina text-xl text-pink-950">
