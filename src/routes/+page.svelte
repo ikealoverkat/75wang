@@ -13,6 +13,7 @@
 
 	let currentDay = $state(0);
 	let startingDate = $state();
+    let started = $state(false);
 
 	let days = $state(
 		Array.from({ length: 75 }, (_, day) => ({
@@ -31,11 +32,27 @@
 				placeholder.style.display = 'none';
 			}
 		}
-		currentDay = dayjs().diff(startingDate, 'day');
-        startingDate = dayjs("2026-05-08");
-        // startingDate = dayjs(localStorage.getItem('startingDate'));
+		let storedDays = localStorage.getItem('days');
+
+		if (storedDays) {
+			days = JSON.parse(storedDays);
+		}
+		// startingDate = dayjs('2026-05-06'); //hardcoded for testing
+		const storedDate = localStorage.getItem('startingDate');
+		if (storedDate) {
+			startingDate = dayjs(localStorage.getItem('startingDate'));
+			currentDay = dayjs().diff(startingDate, 'day');
+		}
+
+        const storedStart = localStorage.getItem('started');
+        if (storedStart) {
+            started = JSON.parse(storedStart);
+        }
+
 		console.log(currentDay);
 		console.log(startingDate);
+		console.log($state.snapshot(days));
+		console.log($state.snapshot(tasks));
 	});
 
 	function addTask(e) {
@@ -50,7 +67,9 @@
 		if (placeholder.style.display !== 'none') placeholder.style.display = 'none';
 
 		localStorage.setItem('tasks', JSON.stringify(tasks));
+		localStorage.setItem('days', JSON.stringify(days));
 		console.log($state.snapshot(tasks));
+		console.log($state.snapshot(days));
 	}
 
 	$effect(() => {
@@ -170,10 +189,12 @@
 			<!-- start button -->
 			<button
 				onclick={() => {
-					startingDate = dayjs();
+                    startingDate = dayjs();
 					console.log(startingDate);
 					localStorage.setItem('startingDate', startingDate);
-                    this.classList.add('hidden');
+                    started = true;
+					localStorage.setItem('started', JSON.stringify(started));
+					this.classList.add('hidden');
 				}}
 				class="bg-linear-to-b from-white/50 to-pink-100/50 p-4 text-center font-hina text-xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-2 hover:from-white hover:to-pink-100 hover:p-5 hover:shadow-sm hover:outline-pink-800/50 active:m-1 active:p-1"
 			>
