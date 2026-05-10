@@ -27,7 +27,8 @@
 	let areYouSureDiv = $state();
 
 	onMount(() => {
-		let storedTasks = localStorage.getItem('tasks');
+		console.log(started);
+        let storedTasks = localStorage.getItem('tasks');
 		if (storedTasks) {
 			tasks = JSON.parse(storedTasks);
 			if (tasks.length > 0) {
@@ -51,13 +52,10 @@
 			started = JSON.parse(storedStart);
 		}
 
-		$effect(() => {
-			if (started == true) {
-				startButton.classList.add('hidden');
-				tracker.classList.remove('hidden');
-				tracker.classList.add('flex');
-			}
-		});
+		if (started == true) {
+			startButton.style.display = 'none';
+			tracker.style.display = 'flex';
+		}
 
 		console.log(currentDay);
 		console.log(startingDate);
@@ -179,9 +177,9 @@
 				</div>
 			</div>
 			<!-- tracking half -->
-			<div class="hidden flex-col items-center" bind:this={tracker}>
+			<div class="flex-col items-center" class:hidden={!started} bind:this={tracker}>
 				<!-- tracker -->
-				<div class="m-8 flex w-1/2 flex-row flex-wrap gap-2">
+				<div class:hidden={!started} class="m-8 flex w-1/2 flex-row flex-wrap gap-2">
 					{#each days as day (day.id)}
 						<div class="relative">
 							<div
@@ -204,22 +202,22 @@
 			<!-- hours until end of day -->
 		</div>
 		<!-- start button -->
-		<button
-			bind:this={startButton}
-			onclick={() => {
-				startingDate = dayjs();
-				console.log(startingDate);
-				localStorage.setItem('startingDate', startingDate);
-				started = true;
-				this.classList.add('hidden');
-				tracker.classList.remove('hidden');
-				tracker.classList.add('flex');
-				localStorage.setItem('started', JSON.stringify(started));
-			}}
-			class="m-8 w-1/2 place-self-center bg-linear-to-b from-white/50 to-pink-100/50 p-4 text-center font-hina text-2xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-9 hover:from-white hover:to-pink-100 hover:p-5 hover:shadow-sm hover:outline-pink-800/50 active:m-8 active:p-4"
-		>
-			start
-		</button>
+		{#if !started}
+			<button
+				bind:this={startButton}
+				onclick={() => {
+					startingDate = dayjs();
+					localStorage.setItem('startingDate', startingDate.toISOString());
+					started = true;
+                    console.log(started);
+					localStorage.setItem('started', JSON.stringify(started));
+				}}
+				class="m-8 w-1/2 place-self-center bg-linear-to-b from-white/50 to-pink-100/50 p-4 text-center font-hina text-2xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-9 hover:from-white hover:to-pink-100 hover:p-5 hover:shadow-sm hover:outline-pink-800/50 active:m-8 active:p-4"
+                style="display: block;"
+            >
+				start
+			</button>
+		{/if}
 	</div>
 
 	<!-- clear button -->
@@ -228,7 +226,7 @@
 			areYouSureDiv.style.display = 'flex';
 		}}
 		class="absolute bottom-5
-         bg-linear-to-b from-white/50 to-pink-100/50 p-2 text-center font-hina text-xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-2 hover:from-white hover:to-pink-100 hover:p-3 hover:shadow-sm hover:outline-pink-800/50 active:m-1 active:p-1 lg:bottom-20"
+        bg-linear-to-b from-white/50 to-pink-100/50 p-2 text-center font-hina text-xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-2 hover:from-white hover:to-pink-100 hover:p-3 hover:shadow-sm hover:outline-pink-800/50 active:m-1 active:p-1 lg:bottom-20"
 	>
 		clear all progress
 	</button>
@@ -255,12 +253,19 @@
 					class="bg-[#BA6C8A] p-2 font-hina text-xl text-white shadow-xs shadow-pink-950/50 outline outline-pink-950/50 duration-200 hover:scale-104 hover:bg-[#AD637F] hover:shadow-sm"
 					onclick={() => {
 						localStorage.clear();
-						tasks.length = 0;
+
+						tasks = [];
+						days = Array.from({ length: 75 }, (_, day) => ({
+							id: day,
+							completion: false
+						}));
+
+						started = false;
+						currentDay = 0;
+						startingDate = null;
 						placeholder.style.display = 'block';
+
 						areYouSureDiv.style.display = 'none';
-						startButton.classList.add('block');
-						startButton.classList.remove('hidden');
-						tracker.classList.add('hidden');
 					}}>OK</button
 				>
 			</span>
