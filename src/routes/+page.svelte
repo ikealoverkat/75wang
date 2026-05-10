@@ -211,10 +211,10 @@
 				console.log(startingDate);
 				localStorage.setItem('startingDate', startingDate);
 				started = true;
-				localStorage.setItem('started', JSON.stringify(started));
 				this.classList.add('hidden');
 				tracker.classList.remove('hidden');
 				tracker.classList.add('flex');
+				localStorage.setItem('started', JSON.stringify(started));
 			}}
 			class="m-8 w-1/2 place-self-center bg-linear-to-b from-white/50 to-pink-100/50 p-4 text-center font-hina text-2xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-9 hover:from-white hover:to-pink-100 hover:p-5 hover:shadow-sm hover:outline-pink-800/50 active:m-8 active:p-4"
 		>
