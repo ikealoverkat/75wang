@@ -268,7 +268,7 @@
 
 <h3 class="m-2 px-4 text-left font-hina text-xl text-pink-950">
 	made w/★ by kat wang
-	<br />75wang is open source (add link later)
+	<br />75wang is <a href="https://github.com/ikealoverkat/75wang" class="underline hover:decoration-wavy">open source</a>
 	<br /> last updated may 2026
 </h3>
 <!-- 
