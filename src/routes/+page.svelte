@@ -14,7 +14,7 @@
 	let currentDay = $state(0);
 	let startingDate = $state();
 	let started = $state(false);
-    let startButton = $state();
+	let startButton = $state();
 	let tracker = $state();
 
 	let days = $state(
@@ -51,11 +51,13 @@
 			started = JSON.parse(storedStart);
 		}
 
-		if (started == true) {
-			startButton.classList.add('hidden');
-			tracker.classList.remove('hidden');
-			tracker.classList.add('flex');
-		}
+		$effect(() => {
+			if (started == true) {
+				startButton.classList.add('hidden');
+				tracker.classList.remove('hidden');
+				tracker.classList.add('flex');
+			}
+		});
 
 		console.log(currentDay);
 		console.log(startingDate);
@@ -204,7 +206,7 @@
 		<!-- start button -->
 		<button
 			bind:this={startButton}
-            onclick={() => {
+			onclick={() => {
 				startingDate = dayjs();
 				console.log(startingDate);
 				localStorage.setItem('startingDate', startingDate);
@@ -256,9 +258,9 @@
 						tasks.length = 0;
 						placeholder.style.display = 'block';
 						areYouSureDiv.style.display = 'none';
-                        startButton.classList.add('block');
-                        startButton.classList.remove('hidden');
-                        tracker.classList.add('hidden');
+						startButton.classList.add('block');
+						startButton.classList.remove('hidden');
+						tracker.classList.add('hidden');
 					}}>OK</button
 				>
 			</span>
@@ -268,7 +270,10 @@
 
 <h3 class="m-2 px-4 text-left font-hina text-xl text-pink-950">
 	made w/★ by kat wang
-	<br />75wang is <a href="https://github.com/ikealoverkat/75wang" class="underline hover:decoration-wavy">open source</a>
+	<br />75wang is
+	<a href="https://github.com/ikealoverkat/75wang" class="underline hover:decoration-wavy"
+		>open source</a
+	>
 	<br /> last updated may 2026
 </h3>
 <!-- 
