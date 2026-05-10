@@ -13,7 +13,9 @@
 
 	let currentDay = $state(0);
 	let startingDate = $state();
-    let started = $state(false);
+	let started = $state(false);
+    let startButton = $state();
+	let tracker = $state();
 
 	let days = $state(
 		Array.from({ length: 75 }, (_, day) => ({
@@ -44,10 +46,16 @@
 			currentDay = dayjs().diff(startingDate, 'day');
 		}
 
-        const storedStart = localStorage.getItem('started');
-        if (storedStart) {
-            started = JSON.parse(storedStart);
-        }
+		const storedStart = localStorage.getItem('started');
+		if (storedStart) {
+			started = JSON.parse(storedStart);
+		}
+
+		if (started == true) {
+			startButton.classList.add('hidden');
+			tracker.classList.remove('hidden');
+			tracker.classList.add('flex');
+		}
 
 		console.log(currentDay);
 		console.log(startingDate);
@@ -84,7 +92,7 @@
 
 <div class="flex h-screen w-screen flex-col place-items-center overflow-x-hidden bg-pink-50 p-12">
 	<!-- title card -->
-	<div class="flex w-1/3 flex-row items-center">
+	<div class="flex w-full flex-col items-center text-center lg:w-1/3 lg:flex-row lg:text-left">
 		<img
 			src="/75wlogo.png"
 			alt="75wang logo"
@@ -99,111 +107,117 @@
 		</div>
 	</div>
 
-	<div class="flex h-full flex-row items-start justify-center">
-		<!-- tasks -->
-		<div class="w-full">
-			<!-- add tasks -->
-			<form id="task-form" class="flex flex-row justify-between p-2" onsubmit={addTask}>
-				<input
-					type="text"
-					id="task-input"
-					bind:value={newTask}
-					bind:this={InputElement}
-					placeholder="enter goals here..."
-					class="mb-4 w-full p-2 px-6 font-hina text-[22px] text-pink-950 duration-300 hover:p-3 focus:outline-none"
-					autocomplete="off"
-				/>
-				<button
-					type="submit"
-					class="mb-4 ml-4 hidden px-4 font-hina text-[22px] font-bold text-pink-800 duration-300 hover:scale-110 hover:rotate-10"
-					>+</button
-				>
-			</form>
-
-			<!-- task list -->
-			<ul class="p-8 font-hina text-2xl text-pink-900 duration-300">
-				<p bind:this={placeholder} class="text-pink-900/40 italic">no goals yet. add one!</p>
-				{#each tasks as task (task.id)}
-					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-					<!-- svelte-ignore a11y_click_events_have_key_events -->
-					<li
-						class="flex flex-row gap-10 duration-300 hover:gap-11 hover:p-1 [&>button]:opacity-0 [&>button]:duration-300 hover:[&>button]:opacity-100"
-						onclick={() => {
-							task.completed = !task.completed;
-							tasks = tasks;
-						}}
+	<div class="flex flex-col">
+		<!-- tasks & tracking -->
+		<div class="flex h-full items-start justify-center sm:flex-col lg:flex-row">
+			<!-- tasks -->
+			<div class="w-full">
+				<!-- add tasks -->
+				<form id="task-form" class="flex flex-col justify-between p-2" onsubmit={addTask}>
+					<input
+						type="text"
+						id="task-input"
+						bind:value={newTask}
+						bind:this={InputElement}
+						placeholder="enter goals here..."
+						class="mb-4 justify-self-center p-2 px-6 text-center align-middle font-hina text-[22px] text-pink-950 duration-300 hover:p-3 focus:outline-none md:field-sizing-content"
+						autocomplete="off"
+					/>
+					<button
+						type="submit"
+						class="mb-4 ml-4 hidden px-4 font-hina text-[22px] font-bold text-pink-800 duration-300 hover:scale-110 hover:rotate-10"
+						>+</button
 					>
-						<input
-							type="checkbox"
-							bind:checked={task.completed}
-							class="mt-1 h-6 w-6 appearance-none rounded-md border-2 border-pink-800/20 bg-linear-to-b from-white to-pink-good/230 duration-200 checked:border-pink-800 checked:bg-pink-800 hover:scale-105"
-						/>
-						<div class="relative w-fit">
-							<span>{task.text}</span>
-							<span
-								class="absolute top-1/2 -left-1 h-0.5 w-full origin-left bg-pink-900/95 transition-transform duration-300"
-								class:scale-x-120={task.completed}
-								class:scale-x-0={!task.completed}
-							>
-							</span>
-						</div>
-						<button
-							onclick={() => {
-								tasks.splice(tasks.indexOf(task), 1);
-								if (tasks.length > 0) {
-									placeholder.style.display = 'none';
-								} else {
-									placeholder.style.display = 'block';
-								}
-							}}
-							class=" font-bold text-pink-900/40 hover:text-pink-900/70"
-						>
-							—
-						</button>
-					</li>
-				{/each}
-			</ul>
-		</div>
-		<!-- tracking half -->
-		<div class="flex flex-col items-center">
-			<!-- tracker -->
-			<div class="m-8 flex w-1/2 flex-row flex-wrap gap-2">
-				{#each days as day (day.id)}
-					<div class="relative">
-						<div
-							class="absolute top-0 z-0 h-12 w-12 origin-bottom bg-pink-good transition-transform duration-200"
-							class:scale-y-100={day.completion === true}
-							class:scale-y-0={day.completion === false}
-						></div>
-						<!-- day -->
-						<div
-							class={day.id == currentDay
-								? 'relative z-10 h-12 w-12 place-content-center bg-pink-good/20 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-950/50 outline-2 outline-pink-900/50 duration-100 hover:scale-105'
-								: 'relative z-10 h-12 w-12 place-content-center bg-pink-good/5 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-800/30 outline outline-pink-900/50 duration-100 hover:scale-105'}
-						>
-							{day.id + 1}
-						</div>
-					</div>
-				{/each}
-			</div>
-			<!-- start button -->
-			<button
-				onclick={() => {
-                    startingDate = dayjs();
-					console.log(startingDate);
-					localStorage.setItem('startingDate', startingDate);
-                    started = true;
-					localStorage.setItem('started', JSON.stringify(started));
-					this.classList.add('hidden');
-				}}
-				class="bg-linear-to-b from-white/50 to-pink-100/50 p-4 text-center font-hina text-xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-2 hover:from-white hover:to-pink-100 hover:p-5 hover:shadow-sm hover:outline-pink-800/50 active:m-1 active:p-1"
-			>
-				start
-			</button>
-		</div>
+				</form>
 
-		<!-- hours until end of day -->
-		<!-- days -->
+				<!-- task list -->
+				<div class="flex items-center justify-center">
+					<ul class="w-fit p-8 text-center font-hina text-2xl text-pink-900 duration-300">
+						<p bind:this={placeholder} class="text-pink-900/40 italic">no goals yet. add one!</p>
+						{#each tasks as task (task.id)}
+							<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+							<!-- svelte-ignore a11y_click_events_have_key_events -->
+							<li
+								class="flex flex-row gap-10 duration-300 hover:gap-11 hover:p-1 [&>button]:opacity-0 [&>button]:duration-300 hover:[&>button]:opacity-100"
+								onclick={() => {
+									task.completed = !task.completed;
+									tasks = tasks;
+								}}
+							>
+								<input
+									type="checkbox"
+									bind:checked={task.completed}
+									class="mt-1 h-6 w-6 appearance-none rounded-md border-2 border-pink-800/20 bg-linear-to-b from-white to-pink-good/230 duration-200 checked:border-pink-800 checked:bg-pink-800 hover:scale-105"
+								/>
+								<div class="relative w-fit">
+									<span>{task.text}</span>
+									<span
+										class="absolute top-1/2 -left-1 h-0.5 w-full origin-left bg-pink-900/95 transition-transform duration-300"
+										class:scale-x-120={task.completed}
+										class:scale-x-0={!task.completed}
+									>
+									</span>
+								</div>
+								<button
+									onclick={() => {
+										tasks.splice(tasks.indexOf(task), 1);
+										if (tasks.length > 0) {
+											placeholder.style.display = 'none';
+										} else {
+											placeholder.style.display = 'block';
+										}
+									}}
+									class=" font-bold text-pink-900/40 hover:text-pink-900/70"
+								>
+									—
+								</button>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			</div>
+			<!-- tracking half -->
+			<div class="hidden flex-col items-center" bind:this={tracker}>
+				<!-- tracker -->
+				<div class="m-8 flex w-1/2 flex-row flex-wrap gap-2">
+					{#each days as day (day.id)}
+						<div class="relative">
+							<div
+								class="absolute top-0 z-0 h-12 w-12 origin-bottom bg-pink-good transition-transform duration-200"
+								class:scale-y-100={day.completion === true}
+								class:scale-y-0={day.completion === false}
+							></div>
+							<!-- day -->
+							<div
+								class={day.id == currentDay
+									? 'relative z-10 h-12 w-12 place-content-center bg-pink-good/20 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-950/50 outline-2 outline-pink-900/50 duration-100 hover:scale-105'
+									: 'relative z-10 h-12 w-12 place-content-center bg-pink-good/5 text-center font-hina text-xl text-pink-900 shadow-sm shadow-pink-800/30 outline outline-pink-900/50 duration-100 hover:scale-105'}
+							>
+								{day.id + 1}
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
+			<!-- hours until end of day -->
+		</div>
+		<!-- start button -->
+		<button
+			bind:this={startButton}
+            onclick={() => {
+				startingDate = dayjs();
+				console.log(startingDate);
+				localStorage.setItem('startingDate', startingDate);
+				started = true;
+				localStorage.setItem('started', JSON.stringify(started));
+				this.classList.add('hidden');
+				tracker.classList.remove('hidden');
+				tracker.classList.add('flex');
+			}}
+			class="m-8 w-1/2 place-self-center bg-linear-to-b from-white/50 to-pink-100/50 p-4 text-center font-hina text-2xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-9 hover:from-white hover:to-pink-100 hover:p-5 hover:shadow-sm hover:outline-pink-800/50 active:m-8 active:p-4"
+		>
+			start
+		</button>
 	</div>
 
 	<!-- clear button -->
@@ -211,7 +225,8 @@
 		onclick={() => {
 			areYouSureDiv.style.display = 'flex';
 		}}
-		class="absolute bottom-20 bg-linear-to-b from-white/50 to-pink-100/50 p-2 text-center font-hina text-xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-2 hover:from-white hover:to-pink-100 hover:p-3 hover:shadow-sm hover:outline-pink-800/50 active:m-1 active:p-1"
+		class="absolute bottom-5
+         bg-linear-to-b from-white/50 to-pink-100/50 p-2 text-center font-hina text-xl font-bold text-pink-800/75 italic shadow-pink-800 outline outline-pink-800/20 duration-200 hover:m-2 hover:from-white hover:to-pink-100 hover:p-3 hover:shadow-sm hover:outline-pink-800/50 active:m-1 active:p-1 lg:bottom-20"
 	>
 		clear all progress
 	</button>
@@ -241,6 +256,9 @@
 						tasks.length = 0;
 						placeholder.style.display = 'block';
 						areYouSureDiv.style.display = 'none';
+                        startButton.classList.add('block');
+                        startButton.classList.remove('hidden');
+                        tracker.classList.add('hidden');
 					}}>OK</button
 				>
 			</span>
