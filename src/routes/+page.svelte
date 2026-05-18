@@ -179,7 +179,7 @@
 			<!-- tracking half -->
 			<div class="flex-col w-[90%] place-items-center items-center" class:hidden={!started} bind:this={tracker}>
 				<!-- tracker -->
-				<div class:hidden={!started} class="m-8 flex flex-row flex-wrap gap-2">
+				<div class:hidden={!started} class="m-8 w-[70%] place-self-center place-content-center flex flex-row flex-wrap gap-2">
 					{#each days as day (day.id)}
 						<div class="relative">
 							<div
