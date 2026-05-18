@@ -109,11 +109,11 @@
 
 	<div class="flex flex-col">
 		<!-- tasks & tracking -->
-		<div class="flex h-full items-start justify-center sm:flex-col lg:flex-row">
+		<div class="flex h-full items-start justify-between sm:flex-col lg:flex-row">
 			<!-- tasks -->
 			<div class="w-full">
 				<!-- add tasks -->
-				<form id="task-form" class="flex flex-col justify-between p-2" onsubmit={addTask}>
+				<form id="task-form" class="flex flex-col p-2" onsubmit={addTask}>
 					<input
 						type="text"
 						id="task-input"
@@ -177,9 +177,9 @@
 				</div>
 			</div>
 			<!-- tracking half -->
-			<div class="flex-col items-center" class:hidden={!started} bind:this={tracker}>
+			<div class="flex-col w-[90%] place-items-center items-center" class:hidden={!started} bind:this={tracker}>
 				<!-- tracker -->
-				<div class:hidden={!started} class="m-8 flex w-1/2 flex-row flex-wrap gap-2">
+				<div class:hidden={!started} class="m-8 flex flex-row flex-wrap gap-2">
 					{#each days as day (day.id)}
 						<div class="relative">
 							<div
